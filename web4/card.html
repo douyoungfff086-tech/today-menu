@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<title>ALL FOOD MENU</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Space Mono', monospace;
+    background:#f5f1ea;
+    overflow:hidden;
+}
+
+.title{
+    text-align:center;
+    padding:30px 20px 10px;
+    letter-spacing:6px;
+    font-size:18px;
+}
+
+.wrapper{
+    display:flex;
+    height:calc(100vh - 120px);
+    padding:20px;
+    gap:12px;
+}
+
+.column{
+    flex:1;
+    overflow:hidden;
+    position:relative;
+}
+
+.track{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    will-change:transform;
+}
+
+.track img{
+    width:100%;
+    display:block;
+    border-radius:8px;
+}
+
+.back{
+    position:fixed;
+    top:20px;
+    left:20px;
+    padding:10px 18px;
+    background:#111;
+    color:white;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    z-index:999;
+}
+
+.control{
+    position:fixed;
+    top:20px;
+    right:20px;
+    display:flex;
+    gap:10px;
+    z-index:999;
+}
+
+.control button{
+    padding:10px 18px;
+    background:#111;
+    color:white;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    font-family:'Space Mono';
+}
+
+</style>
+</head>
+
+<body>
+
+<button class="back" onclick="location.href='index.html'">
+BACK
+</button>
+
+<div class="control">
+    <button id="resetBtn">RESET</button>
+    <button id="autoBtn">START</button>
+</div>
+
+<div class="title">
+    ALL RECOMMENDED MENU
+</div>
+
+<div class="wrapper">
+
+    <div class="column">
+        <div class="track" id="col1"></div>
+    </div>
+
+    <div class="column">
+        <div class="track" id="col2"></div>
+    </div>
+
+    <div class="column">
+        <div class="track" id="col3"></div>
+    </div>
+
+</div>
+
+<script>
+
+const images = [
+    "1.png","2.png","3.png","4.png","5.png",
+    "6.png","7.png","8.png","9.png","10.png",
+    "11.png","12.png","13.png","14.png","15.png",
+    "16.png","17.png","18.png","19.png","20.png"
+];
+
+const col1 = document.getElementById("col1");
+const col2 = document.getElementById("col2");
+const col3 = document.getElementById("col3");
+
+// 建立图片
+function createTrack(track){
+
+    const fullImages = [
+        ...images,
+        ...images
+    ];
+
+    fullImages.forEach(src=>{
+
+        const img = document.createElement("img");
+        img.src = src;
+
+        track.appendChild(img);
+
+    });
+
+}
+
+createTrack(col1);
+createTrack(col2);
+createTrack(col3);
+
+let playing = false;
+let animationId;
+
+let pos1 = 0;
+let pos2 = 0;
+let pos3 = 0;
+
+const speed = 0.7; // 已调快速度
+
+window.onload = () => {
+
+    const loopHeight = col1.scrollHeight / 2;
+
+    function animate(){
+
+        if(playing){
+
+            // 左列 ↓
+            pos1 += speed;
+
+            if(pos1 >= loopHeight){
+                pos1 -= loopHeight;
+            }
+
+            // 中列 ↑
+            pos2 -= speed;
+
+            if(pos2 <= -loopHeight){
+                pos2 += loopHeight;
+            }
+
+            // 右列 ↓
+            pos3 += speed;
+
+            if(pos3 >= loopHeight){
+                pos3 -= loopHeight;
+            }
+
+            col1.style.transform =
+                `translateY(${-loopHeight + pos1}px)`;
+
+            col2.style.transform =
+                `translateY(${pos2}px)`;
+
+            col3.style.transform =
+                `translateY(${-loopHeight + pos3}px)`;
+        }
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // 打开网页自动开始滚动
+    playing = true;
+    document.getElementById("autoBtn").textContent = "STOP";
+    document.getElementById("autoBtn").style.background = "#d32f2f";
+};
+
+// START / STOP
+document.getElementById("autoBtn").addEventListener("click",()=>{
+
+    playing = !playing;
+
+    const btn = document.getElementById("autoBtn");
+
+    if(playing){
+        btn.textContent = "STOP";
+        btn.style.background = "#d32f2f";
+    }else{
+        btn.textContent = "START";
+        btn.style.background = "#111";
+    }
+
+});
+
+// RESET
+document.getElementById("resetBtn").addEventListener("click",()=>{
+
+    pos1 = 0;
+    pos2 = 0;
+    pos3 = 0;
+
+    col1.style.transform = `translateY(${-col1.scrollHeight/2}px)`;
+    col2.style.transform = `translateY(0px)`;
+    col3.style.transform = `translateY(${-col3.scrollHeight/2}px)`;
+
+    document.getElementById("autoBtn").textContent = "STOP";
+    document.getElementById("autoBtn").style.background = "#d32f2f";
+
+    // 复位后自动继续滚动
+    playing = true;
+});
+
+</script>
+
+</body>
+</html>
